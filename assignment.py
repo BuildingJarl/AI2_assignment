@@ -33,24 +33,18 @@ def parseFile( path ):
 
 	for i in range(0,len(data)):
 
-		# convert from strings to floats and ints.
-		data[i][1] = int(data[i][1])
-		data[i][3] = int(data[i][3])
-		data[i][5] = int(data[i][5])
-		data[i][11] = int(data[i][11])
-		data[i][12] = int(data[i][12])
-		data[i][13] = int(data[i][13])
+		# convert from strings to floats.
+		data[i][1] = float(data[i][1])
+		data[i][3] = float(data[i][3])
+		data[i][5] = float(data[i][5])
+		data[i][11] = float(data[i][11])
+		data[i][12] = float(data[i][12])
+		data[i][13] = float(data[i][13])
 
 		#strip \n fron right side of target variable
 		data[i][15] = data[i][15].rstrip('\n')
 
 	return data
-
-def splitList( list, start, end ):
-	newList = []
-	for i in range( start, end ):
-		newList.append(list[i])
-	return newList
 
 def splitListIntoEqualSize( lst, sz ):
 	return [lst[i:i+sz] for i in range(0, len(lst), sz)]
