@@ -162,46 +162,7 @@ def buildTree( rows, scoref=entropy ):
 ### Step 4 displaying the tree
 
 ### Step 5 classifying New observations
-def classify( observation, tree ):
-	if tree.results != None:
-		return tree.results
-	else:
-		v = observation[tree.col]
-		branch = None
-		if isinstance(v,int) or isinstance(v,float):
-			if v >= tree.value: branch = tree.tb
-			else: branch = tree.fb
-		else:
-			if v == tree.value: branch=tree.tb
-			else: branch=tree.fb
-		return classify( observation, branch )
-
-### Step 6 pruning the tree
-def prune( tree, mingain ):
-	#if branches are not leaves, then prune
-	if tree.tb.results == None:
-		prune( tree.tb, mingain )
-	if tree.fb.results == None:
-		prune( tree.fb, mingain )
-
-	#if both subbranches are leaves, chech if they should merge
-	if tree.tb.results != None and tree.fb.results != None:
-		tb,fb = [],[]
-		for v,c in tree.tb.results.items():
-			tb += [[v]]*c
-		for v,c in tree.fb.results.items():
-			fb += [[v]]*c
-
-		#test for reduction in entropy
-		delta = entropy( tb + fb ) - (entropy(tb) + entropy(fb)/2)
-
-		if delta < mingain:
-			#merge branches
-			tree.tb, tree.fb = None,None
-			tree.results = uniquecounts( tb + fb )
-
-### Step 7 dealing with missing data
-def mdclassify(observation, tree):
+def classify(observation, tree):
 	if tree.results != None:
 		return tree.results
 	else:
@@ -228,11 +189,33 @@ def mdclassify(observation, tree):
 			else:
 				if v==tree.value: branch = tree.tb
 				else: branch = tree.fb
-			return mdclassify( observation, branch )
+			return classify( observation, branch )
 
-### Step 8 dealing with Numerical outcomes
-##needed?
+### Step 6 pruning the tree
+def prune( tree, mingain ):
+	#if branches are not leaves, then prune
+	if tree.tb.results == None:
+		prune( tree.tb, mingain )
+	if tree.fb.results == None:
+		prune( tree.fb, mingain )
 
+	#if both subbranches are leaves, chech if they should merge
+	if tree.tb.results != None and tree.fb.results != None:
+		tb,fb = [],[]
+		for v,c in tree.tb.results.items():
+			tb += [[v]]*c
+		for v,c in tree.fb.results.items():
+			fb += [[v]]*c
+
+		#test for reduction in entropy
+		delta = entropy( tb + fb ) - (entropy(tb) + entropy(fb)/2)
+
+		if delta < mingain:
+			#merge branches
+			tree.tb, tree.fb = None,None
+			tree.results = uniquecounts( tb + fb )
+
+## Step 7 convert result to label
 def convertDecTreeOutput2Label(output):
     maxcount = 0
     maxlabel = ''
@@ -250,7 +233,7 @@ def main():
 	#queryData = parseFile('./data/queries.txt')
 	trainingData = parseFile('./data/trainingset.txt')
 	
-	trainingSet = splitListIntoEqualSize( trainingData, 2000 )
+	trainingSet = splitListIntoEqualSize( trainingData, 500 )
 
 	# Step 2 train a model
 	tree = buildTree( trainingSet[0] )
@@ -263,7 +246,7 @@ def main():
 		correct = 0
 
 		for j in range( len(trainingSet[i]) ):
-			o = mdclassify( trainingSet[i][j], tree )
+			o = classify( trainingSet[i][j], tree )
 			p = convertDecTreeOutput2Label(o)
 			predictions.append(p)
 
