@@ -198,9 +198,37 @@ def prune( tree, mingain ):
 		if delta < mingain:
 			#merge branches
 			tree.tb, tree.fb = None,None
-			tree.results = uniquecounts( tb + fb ) 
+			tree.results = uniquecounts( tb + fb )
+
 ### Step 7 dealing with missing data
-##needed?
+def mdclassify(observation, tree):
+	if tree.results != None:
+		return tree.results
+	else:
+		v = observation[ tree.col ]
+		if v == None:
+			#this means there is data missing
+			tr = mdclassify( observation, tree.tb )
+			fr = mdclassify( observation, tree.fb )
+
+			tcount = sum( tr.values() )
+			fcount = sum( fr.values() )
+
+			tw = float(tcount)/( tcount + fcount )
+			fw = float(fcount)/( tcount + fcount )
+
+			result = {}
+			for k,v in tr.items(): result[k] = v * tw
+			for k,v in fr.items(): results[k] = v * fw
+			return result
+		else:
+			if isinstance(v, int) or isinstance(v, float):
+				if v >= tree.value: branch = tree.tb
+				else: branch = tree.fb
+			else:
+				if v==tree.value: branch = tree.tb
+				else: branch = tree.fb
+			return mdclassify( observation, branch )
 
 ### Step 8 dealing with Numerical outcomes
 ##needed?
@@ -222,7 +250,7 @@ def main():
 	#queryData = parseFile('./data/queries.txt')
 	trainingData = parseFile('./data/trainingset.txt')
 	
-	trainingSet = splitListIntoEqualSize( trainingData, 1000 )
+	trainingSet = splitListIntoEqualSize( trainingData, 2000 )
 
 	# Step 2 train a model
 	tree = buildTree( trainingSet[0] )
@@ -235,7 +263,7 @@ def main():
 		correct = 0
 
 		for j in range( len(trainingSet[i]) ):
-			o = classify( trainingSet[i][j], tree )
+			o = mdclassify( trainingSet[i][j], tree )
 			p = convertDecTreeOutput2Label(o)
 			predictions.append(p)
 
