@@ -199,8 +199,8 @@ def convertDecTreeOutput2Label(output):
 
 def main():
 	# Step 1 get data
-	#queryData = parseFile('queries.txt')
-	trainingData = parseFile('trainingset.txt')
+	#queryData = parseFile('./data/queries.txt')
+	trainingData = parseFile('./data/trainingset.txt')
 	
 	trainingSet = splitListIntoEqualSize( trainingData, 1000 )
 
