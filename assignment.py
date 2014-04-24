@@ -1,3 +1,8 @@
+#Paul Kennedy
+#
+#Ivan Bacher
+#C10736831
+
 import math
 
 ### 
@@ -99,6 +104,19 @@ def entropy( rows ):
 		ent = ent - p * log2(p)
 	return ent
 
+def gini( rows ):
+	total = len( rows )
+	counts = uniquecounts( rows )
+	imp = 0
+	for k1 in counts:
+		p1 = float( counts[k1] ) / total
+		for k2 in counts:
+			if k1 == k2: continue
+			p2 = float( counts[k2] ) / total
+			imp += p1 * p2
+	return imp
+
+
 ### Step 3 build a tree
 def buildTree( rows, scoref=entropy ):
 	# 1 find best attribute to split on
@@ -178,6 +196,7 @@ def convertDecTreeOutput2Label(output):
 
 ## Decision tree End
 #####################################################
+
 def main():
 	# Step 1 get data
 	#queryData = parseFile('queries.txt')
