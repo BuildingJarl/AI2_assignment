@@ -46,6 +46,10 @@ def splitList( list, start, end ):
 	for i in range( start, end ):
 		newList.append(list[i])
 	return newList
+
+def splitListIntoEqualSize( lst, sz ):
+	return [lst[i:i+sz] for i in range(0, len(lst), sz)]
+
 #####################################################
 ## Decision tree
 
@@ -178,23 +182,26 @@ def main():
 	# Step 1 get data
 	#queryData = parseFile('queries.txt')
 	trainingData = parseFile('trainingset.txt')
+	
+	trainingSet = splitListIntoEqualSize( trainingData, 1000 )
 
-	tdOne = splitList( trainingData, 0, 500 )
-	tdTwo = splitList( trainingData, 600, 800 )
 	# Step 2 train a model
-	tree = buildTree(tdOne )
-	predictions = []
+	tree = buildTree( trainingSet[0] )
+		
+	#cross validation?
+	for i in range( 1, len(trainingSet) ):
 
-	for i in range( len(tdTwo) ):
-		o = classify( tdTwo[i], tree )
-		p = convertDecTreeOutput2Label(o)
-		predictions.append(p)
+		predictions = []
+		correct = 0
 
-	correct = 0
-	for i in range(len(predictions)):
-		print("Test query: " + str(tdTwo[i]) + ", Predicted target: " + predictions[i])
-		if predictions[i] == tdTwo[i][-1]:
-			correct += 1
-	print("Percentage correct: " + str("%.4f" % round(float(correct)/len(predictions),4)))
+		for j in range( len(trainingSet[i]) ):
+			o = classify( trainingSet[i][j], tree )
+			p = convertDecTreeOutput2Label(o)
+			predictions.append(p)
+
+		for h in range( len(predictions) ):
+			if predictions[h] == trainingSet[i][h][-1]:
+				correct += 1
+		print("Percentage correct: " + str("%.4f" % round(float(correct)/len(predictions),4)))
 
 main()
