@@ -177,8 +177,28 @@ def classify( observation, tree ):
 		return classify( observation, branch )
 
 ### Step 6 pruning the tree
-##needed?
+def prune( tree, mingain ):
+	#if branches are not leaves, then prune
+	if tree.tb.results == None:
+		prune( tree.tb, mingain )
+	if tree.fb.results == None:
+		prune( tree.fb, mingain )
 
+	#if both subbranches are leaves, chech if they should merge
+	if tree.tb.results != None and tree.fb.results != None:
+		tb,fb = [],[]
+		for v,c in tree.tb.results.items():
+			tb += [[v]]*c
+		for v,c in tree.fb.results.items():
+			fb += [[v]]*c
+
+		#test for reduction in entropy
+		delta = entropy( tb + fb ) - (entropy(tb) + entropy(fb)/2)
+
+		if delta < mingain:
+			#merge branches
+			tree.tb, tree.fb = None,None
+			tree.results = uniquecounts( tb + fb ) 
 ### Step 7 dealing with missing data
 ##needed?
 
@@ -206,7 +226,8 @@ def main():
 
 	# Step 2 train a model
 	tree = buildTree( trainingSet[0] )
-		
+	prune( tree, 0.1 ) #not sure about this here
+
 	#cross validation?
 	for i in range( 1, len(trainingSet) ):
 
