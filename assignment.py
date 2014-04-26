@@ -5,9 +5,9 @@
 
 import math
 
-### 
-# Parses file line by line and returns a 2D list containing the data set
-###
+#####################################################
+## File Parsing
+
 def parseFile( path ):
 	#Structure of input file
 	##########
@@ -47,7 +47,11 @@ def parseFile( path ):
 	return data
 
 def splitListIntoEqualSize( lst, sz ):
+	
 	return [lst[i:i+sz] for i in range(0, len(lst), sz)]
+
+## File Parsing End
+#####################################################
 
 #####################################################
 ## Decision tree
@@ -222,8 +226,11 @@ def convertDecTreeOutput2Label(output):
 ## Decision tree End
 #####################################################
 
+
+#####################################################
+###                 Main Function                 ###
+#####################################################
 def main():
-	# Step 1 get data
 
 	#change this to switch between modes
 	testMode = True
@@ -289,4 +296,5 @@ def main():
 
 		resultsFile.close()
 		print("done...")
+
 main()
