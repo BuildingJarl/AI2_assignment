@@ -224,29 +224,69 @@ def convertDecTreeOutput2Label(output):
 
 def main():
 	# Step 1 get data
-	#queryData = parseFile('./data/queries.txt')
-	trainingData = parseFile('./data/trainingset.txt')
+
+	#change this to switch between modes
+	testMode = True
+
+	if( testMode ):
+
+		#Step 1 Get data
+		trainingData = parseFile('./data/trainingset.txt')
+		trainingSet = splitListIntoEqualSize( trainingData, 500 )
+
+		# Step 2 train the model
+		tree = buildTree( trainingSet[0] )
+
+		# Step 3 prune the model
+		prune( tree, 0.1 )
+
+		#cross validation
+		for i in range( 1, len(trainingSet) ):
+
+			predictions = []
+			correct = 0
+
+			for j in range( len(trainingSet[i]) ):
+				o = classify( trainingSet[i][j], tree )
+				p = convertDecTreeOutput2Label(o)
+				predictions.append(p)
+
+			for h in range( len(predictions) ):
+				if predictions[h] == trainingSet[i][h][-1]:
+					correct += 1
+			print("Percentage correct: " + str("%.4f" % round(float(correct)/len(predictions),4)))
+	else:
+
+		print("working...")
+
+		#Step 1 Get data
+		queryData = parseFile('./data/queries.txt')
+		trainingData = parseFile('./data/trainingset.txt')
 	
-	trainingSet = splitListIntoEqualSize( trainingData, 500 )
+		trainingSet = splitListIntoEqualSize( trainingData, 1000 )
 
-	# Step 2 train a model
-	tree = buildTree( trainingSet[0] )
-	prune( tree, 0.1 ) #not sure about this here
+		# Step 2 train the model
+		tree = buildTree( trainingSet[0] )
 
-	#cross validation?
-	for i in range( 1, len(trainingSet) ):
+		# Step 3 prune the model
+		prune( tree, 0.1 )
 
 		predictions = []
-		correct = 0
 
-		for j in range( len(trainingSet[i]) ):
-			o = classify( trainingSet[i][j], tree )
-			p = convertDecTreeOutput2Label(o)
-			predictions.append(p)
+		for i in range( len(queryData) ):
+			o = classify( queryData[i], tree )
+			p = convertDecTreeOutput2Label( o )
+			predictions.append( p )
 
-		for h in range( len(predictions) ):
-			if predictions[h] == trainingSet[i][h][-1]:
-				correct += 1
-		print("Percentage correct: " + str("%.4f" % round(float(correct)/len(predictions),4)))
+		resultsFile = open('./solutions/CXXXXXXXX+C10736831.txt','w+')
 
+		for i in range( len(predictions) ):
+
+			resultsFile.write( queryData[i][0].strip() )
+			resultsFile.write( "," )
+			resultsFile.write( predictions[i].strip() )
+			resultsFile.write( "\n" )
+
+		resultsFile.close()
+		print("done...")
 main()
