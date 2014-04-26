@@ -1,5 +1,5 @@
 #Paul Kennedy
-# ********Dont forget to insert your student number here
+#C10319445
 #Ivan Bacher
 #C10736831
 
@@ -285,7 +285,7 @@ def main():
 			p = convertDecTreeOutput2Label( o )
 			predictions.append( p )
 
-		resultsFile = open('./solutions/CXXXXXXXX+C10736831.txt','w+')
+		resultsFile = open('./solutions/C10319445+C10736831.txt','w+')
 
 		for i in range( len(predictions) ):
 
