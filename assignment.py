@@ -237,6 +237,8 @@ def getdistances(data, query):
 
         # Iterate over every item in the dataset
         for i in range(len(data)):
+                continuous_dist = 0
+                categorical_dist = 0
                 # Numerical Distance between between continuous data.
                 continuous_dist = continuous_dist + math.sqrt((data[i][1]  - query[1])**2)
                 continuous_dist = continuous_dist + math.sqrt((data[i][3]  - query[3])**2)
@@ -299,7 +301,7 @@ def knnestimate(data,query,k=10):
 def main():
 
         #change this to switch between modes
-        testMode = True
+        testMode = False
 
         #Enable/Disable Decision Tree or KNN prediction model 
         DecisionTree= True
