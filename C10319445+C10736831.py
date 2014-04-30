@@ -228,6 +228,11 @@ def convertDecTreeOutput2Label(output):
 
 #####################################################
 ## KNN
+
+def euclideanDistance(v1,v2):
+        dist = math.sqrt((v1 - v2)**2)
+        return dist
+
 def getdistances(data, query):
         #List to put the distances into.
         distancelist=[]
@@ -235,33 +240,53 @@ def getdistances(data, query):
         continuous_dist = 0
         categorical_dist = 0
 
+        maxAge = 0
+        maxEdu = 0
+        maxGains = 0
+        maxLoss = 0
+        maxHours = 0
+
+        # Normalise the Data by finding the maximum value within the data set to bring it to between 0 and 1.
+        for i in range(len(data)):
+                maxAge = max(maxAge,data[i][1])
+                maxEdu = max(maxEdu,data[i][5])
+                maxGains = max(maxGains,data[i][11])
+                maxLoss = max(maxLoss,data[i][12])
+                maxHours = max(maxHours,data[i][13])
+                
         # Iterate over every item in the dataset
         for i in range(len(data)):
                 continuous_dist = 0
                 categorical_dist = 0
                 # Numerical Distance between between continuous data.
-                continuous_dist = continuous_dist + math.sqrt((data[i][1]  - query[1])**2)
-                continuous_dist = continuous_dist + math.sqrt((data[i][3]  - query[3])**2)
-                continuous_dist = continuous_dist + math.sqrt((data[i][5]  - query[5])**2)
-                continuous_dist = continuous_dist + math.sqrt((data[i][11] - query[11])**2)
-                continuous_dist = continuous_dist + math.sqrt((data[i][12] - query[12])**2)
-                continuous_dist = continuous_dist + math.sqrt((data[i][13] - query[13])**2)
+                continuous_dist = continuous_dist + (euclideanDistance(data[i][1],query[1])/maxAge)
+                #continuous_dist = continuous_dist + euclideanDistance(data[i][3],query[3])
+                continuous_dist = continuous_dist + euclideanDistance(data[i][5],query[5]/maxEdu)
+
+                if(query[11] > 50000):
+                        continuous_dist = continuous_dist + euclideanDistance(data[i][11],query[11]/maxGains)
+                        
+                continuous_dist = continuous_dist + euclideanDistance(data[i][12],query[12]/maxLoss)
+                continuous_dist = continuous_dist + euclideanDistance(data[i][13],query[13]/maxHours)
 
                 # Categorical distance between data and query
                 if not(data[i][2] == query[2]):
                         categorical_dist += 1
-                if not(data[i][4] == query[4]):
-                        categorical_dist += 1
+                #if not(data[i][4] == query[4]):
+                        #categorical_dist += 4
                 if not(data[i][6] == query[6]):
                         categorical_dist += 1
                 if not(data[i][7] == query[7]):
-                        categorical_dist += 1
+                        if(data[i][7] == 'Exec-managerial'):
+                                categorical_dist += 1
+                        else:
+                                categorical_dist +=0.5
                 if not(data[i][8] == query[8]):
                         categorical_dist += 1
-                if not(data[i][9] == query[9]):
-                        categorical_dist += 1
-                if not(data[i][10] == query[10]):
-                        categorical_dist += 1
+                #if not(data[i][9] == query[9]):
+                        #categorical_dist += 0.5
+                #if not(data[i][10] == query[10]):
+                       # categorical_dist += 0.5
                 if not(data[i][14] == query[14]):
                         categorical_dist += 1
 
@@ -272,7 +297,7 @@ def getdistances(data, query):
         distancelist.sort()
         return distancelist
 
-def knnestimate(data,query,k=10):
+def knnestimate(data,query,k=3):
 
         #Get the sorted distances between the query and each record in the data set
         dlist = getdistances(data,query)
@@ -280,6 +305,7 @@ def knnestimate(data,query,k=10):
         under50k_count = 0
 
         for i in range(k):
+
                 if dlist[i][2] == ' <=50K':
                         under50k_count = under50k_count + 1
                 else:
@@ -291,6 +317,7 @@ def knnestimate(data,query,k=10):
                 return ' <=50K'
         else:
                 return ' >50K'
+
 
 ## KNN End
 #####################################################
